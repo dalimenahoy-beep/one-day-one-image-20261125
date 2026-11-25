@@ -1,11 +1,26 @@
-// A working news-image-daily entry (Node 22, standard library only): its image is the entry.png beside this file, and
-// the program copies it to /output/entry.png. A starting point, not a winner: replace the image. The gate takes a
-// whole PNG or JPEG of at most 1 MiB and 1024 by 1024 pixels, and the judge sees exactly the bytes copied.
+// One Day, One Image — 25 November 2026 entry.
 //
-// Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
-//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+// The poster (entry.png, drawn at build time by make_poster.py) is committed
+// beside this file. At grading time the sandbox runs only Node, so this
+// program does exactly one thing: copy the committed PNG into the output
+// directory as entry.png, byte for byte. Standard library only.
 
-import { copyFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { copyFileSync, mkdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-copyFileSync(new URL('./entry.png', import.meta.url), join(process.env.MAKEFUN_OUTPUT_DIR ?? '/output', 'entry.png'));
+function posterPath() {
+  return join(dirname(fileURLToPath(import.meta.url)), 'entry.png');
+}
+
+function outputPath() {
+  const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+  mkdirSync(outDir, { recursive: true });
+  return join(outDir, 'entry.png');
+}
+
+function deliverPoster() {
+  copyFileSync(posterPath(), outputPath());
+}
+
+deliverPoster();
